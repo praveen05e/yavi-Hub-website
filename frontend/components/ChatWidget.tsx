@@ -129,7 +129,7 @@ export default function ChatWidget() {
           )}
         </div>
 
-        <div className="border-t border-near-black/10 p-4">
+        <div className="border-t border-near-black/10 p-4 pb-6 sm:pb-4">
           {errorFallback ? (
             <a
               href="/contact"

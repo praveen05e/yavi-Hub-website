@@ -52,7 +52,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative flex min-h-screen items-end overflow-hidden bg-charcoal">
+    <section className="relative flex min-h-screen items-center md:items-end overflow-hidden bg-charcoal">
       <div ref={imgRef} className="absolute inset-0">
         {/* Replace with real YAVI hero photography/video at this path */}
         <img
@@ -64,7 +64,7 @@ export default function Hero() {
       </div>
       <div ref={panelRef} className="absolute inset-0 z-10 bg-cream" style={{ transformOrigin: "left" }} />
 
-      <div className="relative z-20 mx-auto w-full max-w-7xl px-6 pb-20 lg:px-10 lg:pb-28">
+      <div className="relative z-20 mx-auto w-full max-w-7xl px-6 pt-24 pb-20 md:pt-0 lg:px-10 lg:pb-28">
         <div ref={wordmarkRef} className="eyebrow mb-6 text-ivory/80">
           {siteConfig.name}
         </div>

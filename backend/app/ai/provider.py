@@ -54,7 +54,13 @@ class MockOpenAIProvider(AIProvider):
         last_user_msg = ""
         for m in reversed(messages):
             if m["role"] == "user":
-                last_user_msg = m["content"].lower()
+                last_user_msg = m["content"].strip()
+                break
+
+        last_assistant_msg = ""
+        for m in reversed(messages[:-1]):  # exclude the last user message
+            if m["role"] == "assistant":
+                last_assistant_msg = m["content"].lower()
                 break
 
         known_block = {}
@@ -67,40 +73,64 @@ class MockOpenAIProvider(AIProvider):
 
         fields = {**known_block}
 
-        # Simple field extraction logic
-        if "apartment" in last_user_msg or "flat" in last_user_msg:
-            fields["property_type"] = "Apartment"
-        elif "villa" in last_user_msg or "house" in last_user_msg:
-            fields["property_type"] = "Villa"
-        elif "office" in last_user_msg or "studio" in last_user_msg or "commercial" in last_user_msg:
-            fields["property_type"] = "Office"
+        # Check what we asked in the previous turn and extract the field
+        if last_assistant_msg:
+            last_msg_lower = last_user_msg.lower()
+            if "name, please" in last_assistant_msg or "know your name" in last_assistant_msg:
+                # Remove common intro phrases
+                clean_name = re.sub(r'^(my name is|i am|this is|i\'m)\s+', '', last_msg_lower).strip().title()
+                fields["name"] = clean_name
+            elif "where are you located" in last_assistant_msg or "share your location" in last_assistant_msg:
+                clean_loc = re.sub(r'^(i am in|i live in|located in|in|at)\s+', '', last_msg_lower).strip().title()
+                fields["location"] = clean_loc
+            elif "type of property" in last_assistant_msg:
+                if "apartment" in last_msg_lower or "flat" in last_msg_lower:
+                    fields["property_type"] = "Apartment"
+                elif "villa" in last_msg_lower or "house" in last_msg_lower or "home" in last_msg_lower:
+                    fields["property_type"] = "Villa"
+                elif "office" in last_msg_lower or "studio" in last_msg_lower or "commercial" in last_msg_lower:
+                    fields["property_type"] = "Office"
+                else:
+                    fields["property_type"] = last_user_msg.title()
+            elif "design style" in last_assistant_msg:
+                fields["design_style"] = last_user_msg.title()
+            elif "approximate budget" in last_assistant_msg:
+                fields["budget"] = last_user_msg
+            elif "email address" in last_assistant_msg:
+                email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', last_msg_lower)
+                if email_match:
+                    fields["email"] = email_match.group(0)
+                else:
+                    fields["email"] = last_user_msg
+            elif "phone number" in last_assistant_msg:
+                phone_match = re.search(r'\b\d{10}\b', last_msg_lower)
+                if phone_match:
+                    fields["phone"] = phone_match.group(0)
+                else:
+                    fields["phone"] = last_user_msg
 
-        if "minimal" in last_user_msg or "modern" in last_user_msg or "luxury" in last_user_msg or "contemporary" in last_user_msg:
-            fields["design_style"] = last_user_msg.title()
+        # Fallback keyword matching just in case they mention things out of order
+        last_msg_lower = last_user_msg.lower()
+        if not fields.get("property_type"):
+            if "apartment" in last_msg_lower or "flat" in last_msg_lower:
+                fields["property_type"] = "Apartment"
+            elif "villa" in last_msg_lower or "house" in last_msg_lower:
+                fields["property_type"] = "Villa"
+            elif "office" in last_msg_lower or "commercial" in last_msg_lower:
+                fields["property_type"] = "Office"
 
-        budget_match = re.search(r'\b\d+\s*(?:lakh|lakhs|k|thousand|cr)?\b', last_user_msg)
-        if budget_match:
-            fields["budget"] = last_user_msg
+        if not fields.get("email"):
+            email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', last_msg_lower)
+            if email_match:
+                fields["email"] = email_match.group(0)
 
-        email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', last_user_msg)
-        if email_match:
-            fields["email"] = email_match.group(0)
+        if not fields.get("phone"):
+            phone_match = re.search(r'\b\d{10}\b', last_msg_lower)
+            if phone_match:
+                fields["phone"] = phone_match.group(0)
 
-        phone_match = re.search(r'\b\d{10}\b', last_user_msg)
-        if phone_match:
-            fields["phone"] = phone_match.group(0)
-
-        if "my name is" in last_user_msg:
-            fields["name"] = last_user_msg.split("my name is")[-1].strip().title()
-        elif "i am" in last_user_msg:
-            fields["name"] = last_user_msg.split("i am")[-1].strip().title()
-        elif last_user_msg in ["hi", "hello", "hey"]:
-            pass
-        elif len(last_user_msg.split()) == 1 and not any(fields.get(f) for f in ["name", "email", "phone"]):
-            # If they just said a single word and we asked for name, assume it's their name
-            fields["name"] = last_user_msg.title()
-
-        missing = [f for f in ["property_type", "design_style", "budget", "name", "email", "phone"] if not fields.get(f)]
+        # Decide missing fields based on the checklist
+        missing = [f for f in ["name", "location", "property_type", "design_style", "budget", "email", "phone"] if not fields.get(f)]
 
         is_complete = False
         if not missing:
@@ -108,14 +138,16 @@ class MockOpenAIProvider(AIProvider):
             is_complete = True
         else:
             next_f = missing[0]
-            if next_f == "property_type":
+            if next_f == "name":
+                reply = "Got it. May I know your name, please?"
+            elif next_f == "location":
+                reply = "Where are you located? (e.g., Chennai, Delhi, Mumbai)"
+            elif next_f == "property_type":
                 reply = "What type of property is this? (e.g., Apartment, Villa, Office)"
             elif next_f == "design_style":
                 reply = "What design style do you prefer? (e.g., Modern, Contemporary, Minimalist)"
             elif next_f == "budget":
                 reply = "What is your approximate budget for this project?"
-            elif next_f == "name":
-                reply = "Got it. May I know your name, please?"
             elif next_f == "email":
                 reply = "Perfect. Could you please share your email address?"
             elif next_f == "phone":
@@ -160,11 +192,9 @@ _PROVIDERS = {
 def get_ai_provider() -> AIProvider:
     import os
     key = os.environ.get("OPENAI_API_KEY") or ""
-    if settings.ai_provider == "openai" and ("your-real-key" in key or "your-" in key):
+    if settings.ai_provider == "openai" and (not key or "your-real-key" in key or "your-" in key):
         return MockOpenAIProvider()
     if settings.ai_provider == "anthropic" and not settings.anthropic_api_key:
-        return EchoProvider()
-    if settings.ai_provider == "openai" and not os.environ.get("OPENAI_API_KEY"):
         return EchoProvider()
     provider_cls = _PROVIDERS.get(settings.ai_provider)
     if not provider_cls:
