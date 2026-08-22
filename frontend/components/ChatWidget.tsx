@@ -11,8 +11,8 @@ function makeSessionId() {
 }
 
 function renderMessageContent(content: string) {
-  const imgRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  const imgRegex = /!\[([^\]]*)\]\s*\(([^)]+)\)/g;
+  const linkRegex = /\[([^\]]+)\]\s*\(([^)]+)\)/g;
   const parts: React.ReactNode[] = [];
   let lastIndex = 0;
   const matches: { type: "image" | "link"; index: number; length: number; text?: string; url?: string; alt?: string; src?: string }[] = [];
@@ -174,6 +174,7 @@ export default function ChatWidget() {
 
       {/* Panel */}
       <div
+        data-lenis-prevent
         className={`fixed z-50 flex flex-col bg-ivory shadow-2xl transition-all duration-500 ease-out-expo
           inset-x-0 bottom-0 h-[85vh] rounded-t-2xl
           sm:inset-auto sm:bottom-6 sm:right-6 sm:h-[600px] sm:w-[400px] sm:rounded-2xl
@@ -192,7 +193,7 @@ export default function ChatWidget() {
           </button>
         </div>
 
-        <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
+        <div ref={scrollRef} data-lenis-prevent className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
