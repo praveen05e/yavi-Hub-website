@@ -91,6 +91,7 @@ export default function Navbar() {
           open ? "pointer-events-auto translate-y-0" : "pointer-events-none -translate-y-full"
         }`}
         aria-hidden={!open}
+        {...(!open ? { inert: true } : {})}
       >
         <div className="flex items-center justify-between px-6 py-6">
           <Image src="/logo.png" alt="YAVI Logo" width={90} height={36} className="object-contain brightness-0 invert" priority />
