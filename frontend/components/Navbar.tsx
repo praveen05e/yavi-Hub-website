@@ -24,14 +24,12 @@ export default function Navbar() {
     document.body.style.overflow = open ? "hidden" : "";
   }, [open]);
 
-  const lightMode = isHome && !scrolled;
+  const lightMode = false;
 
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-out-expo ${
-          scrolled ? "bg-ivory/90 backdrop-blur-md shadow-[0_1px_0_rgba(23,19,15,0.06)]" : "bg-transparent"
-        }`}
+        className="fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-out-expo bg-white/90 backdrop-blur-md shadow-[0_1px_0_rgba(23,19,15,0.06)]"
       >
         <div
           className={`mx-auto flex max-w-7xl items-center justify-between px-6 transition-all duration-500 ease-out-expo lg:px-10 ${
