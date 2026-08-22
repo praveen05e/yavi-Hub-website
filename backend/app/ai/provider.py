@@ -130,6 +130,51 @@ class MockOpenAIProvider(AIProvider):
                 fields["phone"] = phone_match.group(0)
 
         # Decide missing fields based on the checklist
+        # Determine service info/image if user mentions a service type
+        service_prefix = ""
+        if "villa" in last_msg_lower:
+            fields["property_type"] = "Villa"
+            service_prefix = (
+                "For villas, we specialize in premium **Full Home Turnkey Interiors**, handling everything from layout changes to custom paneling.\n\n"
+                "Here is one of our premium villa living rooms:\n"
+                "![YAVI Villa Project](/images/services/villa.jpg)\n"
+                "👉 [View our Villa Portfolio](/projects/modern-villa-chennai)\n\n"
+            )
+        elif "apartment" in last_msg_lower or "flat" in last_msg_lower:
+            fields["property_type"] = "Apartment"
+            service_prefix = (
+                "For apartments, we design **space-maximizing modular furniture** and custom wall treatments to make the space feel large and open.\n\n"
+                "Here is a living room we designed:\n"
+                "![YAVI Apartment Project](/images/services/apartment.jpg)\n"
+                "👉 [View our Apartment Portfolio](/projects/contemporary-apartment-3bhk)\n\n"
+            )
+        elif "kitchen" in last_msg_lower:
+            fields["property_type"] = "Kitchen"
+            service_prefix = (
+                "Our **Modular Kitchens** feature premium Hettich/Blum hardware, acrylic finishes, and smart organizers.\n\n"
+                "Check out this dream kitchen design:\n"
+                "![YAVI Modular Kitchen](/images/services/kitchen.jpg)\n\n"
+            )
+        elif "office" in last_msg_lower or "commercial" in last_msg_lower or "corporate" in last_msg_lower or "workspace" in last_msg_lower:
+            fields["property_type"] = "Office"
+            service_prefix = (
+                "For corporate spaces, we provide end-to-end **Office Fitouts** designed for productivity and brand identity.\n\n"
+                "Here is one of our executive reception designs:\n"
+                "![YAVI Office Project](/images/services/office.jpg)\n"
+                "👉 [View our Office Fitout Projects](/projects/boutique-office-fitout)\n\n"
+            )
+
+        # Check if asking about pricing/cost/packages
+        pricing_prefix = ""
+        if any(w in last_msg_lower for w in ["cost", "price", "pricing", "package", "packages", "rate", "rates", "budget"]):
+            pricing_prefix = (
+                "We offer 3 primary interior packages tailored to your budget:\n"
+                "- **Standard** (₹1,000-₹1,500/sq.ft): Smart, high-quality finishes, perfect for modern apartments.\n"
+                "- **Premium** (₹1,800-₹2,500/sq.ft): Custom modular woodwork, false ceilings, lighting, and full designer styling.\n"
+                "- **Luxury** (₹3,500+/sq.ft): Elite Italian marbles, premium veneers, and automated systems.\n\n"
+            )
+
+        # Decide missing fields based on the checklist
         missing = [f for f in ["name", "location", "property_type", "design_style", "budget", "email", "phone"] if not fields.get(f)]
 
         is_complete = False
@@ -155,8 +200,23 @@ class MockOpenAIProvider(AIProvider):
             else:
                 reply = "Could you tell me a little more about your space?"
 
+        # Combine prefixes and reply
+        full_reply = ""
+        if service_prefix:
+            full_reply += service_prefix
+        if pricing_prefix:
+            full_reply += pricing_prefix
+
+        if service_prefix or pricing_prefix:
+            if not is_complete:
+                full_reply += f"To help us quote accurately, {reply[0].lower()}{reply[1:]}"
+            else:
+                full_reply += reply
+        else:
+            full_reply = reply
+
         res = {
-            "reply": reply,
+            "reply": full_reply,
             "fields": fields,
             "is_complete": is_complete
         }

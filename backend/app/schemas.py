@@ -34,18 +34,17 @@ class LeadBase(BaseModel):
     timeline: Optional[str] = None
     requirements: Optional[str] = None
 
+class LeadCreate(LeadBase):
+    name: str
+    phone: str
+    source: Optional[str] = "Contact Form"
+
     @field_validator("phone")
     @classmethod
     def validate_phone(cls, v):
         if v and not INDIAN_PHONE_RE.match(v.replace(" ", "")):
             raise ValueError("Enter a valid Indian phone number")
         return v
-
-
-class LeadCreate(LeadBase):
-    name: str
-    phone: str
-    source: Optional[str] = "Contact Form"
 
 
 class LeadStatusUpdate(BaseModel):

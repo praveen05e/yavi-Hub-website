@@ -10,6 +10,88 @@ function makeSessionId() {
   return `sess_${Math.random().toString(36).slice(2)}_${Date.now()}`;
 }
 
+function renderMessageContent(content: string) {
+  const imgRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  const matches: { type: "image" | "link"; index: number; length: number; text?: string; url?: string; alt?: string; src?: string }[] = [];
+  let match;
+
+  imgRegex.lastIndex = 0;
+  linkRegex.lastIndex = 0;
+
+  while ((match = imgRegex.exec(content)) !== null) {
+    matches.push({
+      type: "image",
+      index: match.index,
+      length: match[0].length,
+      alt: match[1],
+      src: match[2],
+    });
+  }
+
+  while ((match = linkRegex.exec(content)) !== null) {
+    if (match.index > 0 && content[match.index - 1] === "!") {
+      continue;
+    }
+    matches.push({
+      type: "link",
+      index: match.index,
+      length: match[0].length,
+      text: match[1],
+      url: match[2],
+    });
+  }
+
+  matches.sort((a, b) => a.index - b.index);
+
+  if (matches.length === 0) {
+    return <span className="whitespace-pre-line">{content}</span>;
+  }
+
+  matches.forEach((m, i) => {
+    if (m.index > lastIndex) {
+      parts.push(
+        <span key={`text-${i}`} className="whitespace-pre-line">
+          {content.substring(lastIndex, m.index)}
+        </span>
+      );
+    }
+    if (m.type === "image") {
+      parts.push(
+        <div key={`img-${i}`} className="my-2 overflow-hidden rounded-lg border border-near-black/10">
+          <img src={m.src} alt={m.alt} className="w-full object-cover max-h-[180px]" />
+        </div>
+      );
+    } else if (m.type === "link") {
+      parts.push(
+        <a
+          key={`link-${i}`}
+          href={m.url}
+          className="text-bronze underline hover:text-near-black transition-colors font-medium"
+          target={m.url?.startsWith("http") ? "_blank" : "_self"}
+          rel="noopener noreferrer"
+        >
+          {m.text}
+        </a>
+      );
+    }
+    lastIndex = m.index + m.length;
+  });
+
+  if (lastIndex < content.length) {
+    parts.push(
+      <span key="text-end" className="whitespace-pre-line">
+        {content.substring(lastIndex)}
+      </span>
+    );
+  }
+
+  return <>{parts}</>;
+}
+
+
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([
@@ -118,7 +200,7 @@ export default function ChatWidget() {
                   m.role === "user" ? "bg-charcoal text-ivory" : "bg-cream text-near-black"
                 }`}
               >
-                {m.content}
+                {renderMessageContent(m.content)}
               </div>
             </div>
           ))}
