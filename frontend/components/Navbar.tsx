@@ -24,12 +24,14 @@ export default function Navbar() {
     document.body.style.overflow = open ? "hidden" : "";
   }, [open]);
 
-  const lightMode = false;
+  const lightMode = isHome && !scrolled;
 
   return (
     <>
       <header
-        className="fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-out-expo bg-white/90 backdrop-blur-md shadow-[0_1px_0_rgba(23,19,15,0.06)]"
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ease-out-expo ${
+          scrolled ? "bg-white/90 backdrop-blur-md shadow-[0_1px_0_rgba(23,19,15,0.06)]" : "bg-transparent"
+        }`}
       >
         <div
           className={`mx-auto flex max-w-7xl items-center justify-between px-6 transition-all duration-500 ease-out-expo lg:px-10 ${
@@ -72,19 +74,21 @@ export default function Navbar() {
           <button
             aria-label="Open menu"
             onClick={() => setOpen(true)}
-            className={`flex items-center justify-center p-2 md:hidden transition-colors duration-300 ${
-              lightMode ? "text-ivory" : "text-near-black"
+            className={`flex items-center justify-center rounded-full h-11 w-11 border transition-all duration-300 md:hidden ${
+              lightMode 
+                ? "border-ivory/20 text-ivory hover:bg-ivory/10" 
+                : "border-near-black/10 text-near-black hover:bg-near-black/5"
             }`}
           >
-            <Menu size={26} />
+            <Menu size={20} />
           </button>
         </div>
       </header>
 
       {/* Mobile fullscreen overlay menu */}
       <div
-        className={`fixed inset-0 z-[60] flex flex-col bg-charcoal text-ivory transition-opacity duration-500 ease-out-expo md:hidden ${
-          open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        className={`fixed inset-0 z-[60] flex flex-col bg-charcoal text-ivory transition-all duration-500 ease-out-expo md:hidden ${
+          open ? "pointer-events-auto translate-y-0" : "pointer-events-none -translate-y-full"
         }`}
         aria-hidden={!open}
       >
@@ -94,31 +98,36 @@ export default function Navbar() {
             <X size={26} />
           </button>
         </div>
-        <nav className="flex flex-1 flex-col justify-center gap-2 px-6">
+        <nav className="flex flex-1 flex-col justify-center gap-6 px-8">
           {siteConfig.nav.map((item, i) => (
             <Link
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
-              className="font-display text-4xl leading-tight transition-transform duration-500 ease-out-expo"
+              className="group flex items-baseline gap-4 font-display text-4xl leading-tight transition-all duration-500 ease-out-expo hover:text-bronze"
               style={{
                 transitionDelay: open ? `${i * 60}ms` : "0ms",
                 transform: open ? "translateY(0)" : "translateY(16px)",
                 opacity: open ? 1 : 0,
               }}
             >
-              {item.label}
+              <span className="text-xs font-medium text-bronze font-body">0{i + 1}</span>
+              <span>{item.label}</span>
             </Link>
           ))}
         </nav>
-        <div className="px-6 pb-10">
+        <div className="px-8 pb-10">
           <Link
             href="/contact"
             onClick={() => setOpen(false)}
-            className="block rounded-full bg-ivory px-6 py-3 text-center text-sm font-medium text-near-black"
+            className="block rounded-full bg-ivory px-6 py-3.5 text-center text-sm font-medium text-near-black hover:bg-white transition-colors duration-300"
           >
             {siteConfig.primaryCta}
           </Link>
+          <div className="mt-8 flex flex-col gap-1 border-t border-ivory/10 pt-6 text-[11px] uppercase tracking-wider text-ivory/40 font-body">
+            <div>Call: 080560 02400</div>
+            <div>Email: hello@yavi.studio</div>
+          </div>
         </div>
       </div>
     </>
