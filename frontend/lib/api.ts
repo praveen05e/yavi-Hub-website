@@ -53,6 +53,11 @@ export const api = {
       headers: { Authorization: `Bearer ${token}` },
       body: JSON.stringify({ lead_status }),
     }),
+  deleteLead: (token: string, id: string) =>
+    request(`/api/admin/leads/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    }),
   changePassword: (token: string, payload: Record<string, string>) =>
     request(`/api/auth/change-password`, {
       method: "POST",

@@ -82,6 +82,19 @@ def get_lead_conversations(
     lead_id: str, db: Session = Depends(get_db), _admin: models.User = Depends(security.get_current_admin)
 ):
     return db.query(models.Conversation).filter(models.Conversation.lead_id == lead_id).all()
+@router.delete("/admin/leads/{lead_id}")
+def delete_lead(
+    lead_id: str,
+    db: Session = Depends(get_db),
+    _admin: models.User = Depends(security.get_current_admin),
+):
+    lead = db.query(models.Lead).filter(models.Lead.id == lead_id).first()
+    if not lead:
+        raise HTTPException(404, "Lead not found")
+    db.delete(lead)
+    db.commit()
+    return {"status": "success"}
+
 
 
 @router.get("/admin/dashboard", response_model=schemas.DashboardStats)
