@@ -23,7 +23,7 @@ INDIAN_PHONE_RE = re.compile(r"^(\+91[\-\s]?)?[6-9]\d{9}$")
 class LeadBase(BaseModel):
     name: Optional[str] = None
     phone: Optional[str] = None
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     location: Optional[str] = None
     property_type: Optional[str] = None
     project_type: Optional[str] = None
@@ -37,6 +37,7 @@ class LeadBase(BaseModel):
 class LeadCreate(LeadBase):
     name: str
     phone: str
+    email: Optional[EmailStr] = None
     source: Optional[str] = "Contact Form"
 
     @field_validator("phone")
