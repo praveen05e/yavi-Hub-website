@@ -1,6 +1,6 @@
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import or_
 
 from app.database import get_db
@@ -81,7 +81,12 @@ def update_lead_status(
 def get_lead_conversations(
     lead_id: str, db: Session = Depends(get_db), _admin: models.User = Depends(security.get_current_admin)
 ):
-    return db.query(models.Conversation).filter(models.Conversation.lead_id == lead_id).all()
+    return (
+        db.query(models.Conversation)
+        .options(joinedload(models.Conversation.messages))
+        .filter(models.Conversation.lead_id == lead_id)
+        .all()
+    )
 @router.delete("/admin/leads/{lead_id}")
 def delete_lead(
     lead_id: str,
