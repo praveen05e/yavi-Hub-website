@@ -122,63 +122,69 @@ class MockOpenAIProvider(AIProvider):
                 "![YAVI Office Project](/images/services/office.jpg)\n\n"
             )
 
-        # 2. If it's a real response, extract and validate fields
-        if last_assistant_msg and not is_query:
-            # Common refusal/skip keywords
-            refusals = ["no", "nope", "skip", "no need", "private", "not sharing", "sorry no", "don't want", "dont want", "later"]
-            is_refusal = any(r == last_msg_lower or last_msg_lower.startswith(r + " ") for r in refusals)
+        # 2. Extract and validate fields from the ENTIRE history
+        for i in range(len(messages)):
+            if messages[i]["role"] == "assistant":
+                ast_msg = messages[i]["content"].lower()
+                if i + 1 < len(messages) and messages[i+1]["role"] == "user":
+                    usr_msg = messages[i+1]["content"].lower()
+                    usr_raw = messages[i+1]["content"]
+                    
+                    # Common refusal/skip keywords
+                    refusals = ["no", "nope", "skip", "no need", "private", "not sharing", "sorry no", "don't want", "dont want", "later"]
+                    is_refusal = any(r == usr_msg or usr_msg.startswith(r + " ") for r in refusals)
 
-            if "name, please" in last_assistant_msg or "know your name" in last_assistant_msg:
-                if is_refusal:
-                    fields["name"] = "Valued Customer"
-                elif len(last_user_msg.split()) <= 4:
-                    clean_name = re.sub(r'^(my name is|i am|this is|i\'m)\s+', '', last_msg_lower).strip().title()
-                    fields["name"] = clean_name
+                    if "name, please" in ast_msg or "know your name" in ast_msg:
+                        if is_refusal:
+                            fields["name"] = "Valued Customer"
+                        elif len(usr_msg.split()) <= 4:
+                            clean_name = re.sub(r'^(my name is|i am|this is|i\'m)\s+', '', usr_msg).strip().title()
+                            fields["name"] = clean_name
 
-            elif "where are you located" in last_assistant_msg or "share your location" in last_assistant_msg:
-                if is_refusal:
-                    fields["location"] = "Not Shared"
-                elif len(last_user_msg.split()) <= 4:
-                    clean_loc = re.sub(r'^(i am in|i live in|located in|in|at)\s+', '', last_msg_lower).strip().title()
-                    fields["location"] = clean_loc
+                    elif "where are you located" in ast_msg or "share your location" in ast_msg:
+                        if is_refusal:
+                            fields["location"] = "Not Shared"
+                        elif len(usr_msg.split()) <= 4:
+                            clean_loc = re.sub(r'^(i am in|i live in|located in|in|at)\s+', '', usr_msg).strip().title()
+                            fields["location"] = clean_loc
 
-            elif "type of property" in last_assistant_msg:
-                if "apartment" in last_msg_lower or "flat" in last_msg_lower:
-                    fields["property_type"] = "Apartment"
-                elif "villa" in last_msg_lower or "house" in last_msg_lower or "home" in last_msg_lower:
-                    fields["property_type"] = "Villa"
-                elif "office" in last_msg_lower or "studio" in last_msg_lower or "commercial" in last_msg_lower:
-                    fields["property_type"] = "Office"
-                elif is_refusal:
-                    fields["property_type"] = "Not Specified"
-                elif len(last_user_msg.split()) <= 4:
-                    fields["property_type"] = last_user_msg.title()
+                    elif "type of property" in ast_msg:
+                        if "apartment" in usr_msg or "flat" in usr_msg:
+                            fields["property_type"] = "Apartment"
+                        elif "villa" in usr_msg or "house" in usr_msg or "home" in usr_msg:
+                            fields["property_type"] = "Villa"
+                        elif "office" in usr_msg or "studio" in usr_msg or "commercial" in usr_msg:
+                            fields["property_type"] = "Office"
+                        elif is_refusal:
+                            fields["property_type"] = "Not Specified"
+                        elif len(usr_msg.split()) <= 4:
+                            fields["property_type"] = usr_raw.strip().title()
 
-            elif "design style" in last_assistant_msg:
-                if is_refusal:
-                    fields["design_style"] = "Not Specified"
-                elif len(last_user_msg.split()) <= 6:
-                    fields["design_style"] = last_user_msg.title()
+                    elif "design style" in ast_msg:
+                        if is_refusal:
+                            fields["design_style"] = "Not Specified"
+                        elif len(usr_msg.split()) <= 6:
+                            fields["design_style"] = usr_raw.strip().title()
 
-            elif "approximate budget" in last_assistant_msg:
-                if is_refusal:
-                    fields["budget"] = "Not Specified"
-                elif len(last_user_msg.split()) <= 6:
-                    fields["budget"] = last_user_msg
+                    elif "approximate budget" in ast_msg:
+                        if is_refusal:
+                            fields["budget"] = "Not Specified"
+                        elif len(usr_msg.split()) <= 6:
+                            fields["budget"] = usr_raw.strip()
 
-            elif "email address" in last_assistant_msg:
-                email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', last_msg_lower)
-                if email_match:
-                    fields["email"] = email_match.group(0)
-                elif is_refusal:
-                    fields["email"] = "notshared@yavi.studio"
+                    elif "email address" in ast_msg:
+                        email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', usr_msg)
+                        if email_match:
+                            fields["email"] = email_match.group(0)
+                        elif is_refusal:
+                            fields["email"] = "notshared@yavi.studio"
 
-            elif "phone number" in last_assistant_msg:
-                phone_match = re.search(r'\b\d{10}\b', last_msg_lower)
-                if phone_match:
-                    fields["phone"] = phone_match.group(0)
-                elif is_refusal:
-                    fields["phone"] = "0000000000"
+                    elif "phone number" in ast_msg:
+                        phone_match = re.search(r'\b\d{10}\b', usr_msg)
+                        if phone_match:
+                            fields["phone"] = phone_match.group(0)
+                        elif is_refusal:
+                            fields["phone"] = "0000000000"
 
         # Fallback quick keyword extraction (if they volunteer info out of order)
         if not fields.get("property_type"):
