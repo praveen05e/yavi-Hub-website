@@ -126,8 +126,8 @@ export default function Navbar() {
             {siteConfig.primaryCta}
           </Link>
           <div className="mt-8 flex flex-col gap-1 border-t border-ivory/10 pt-6 text-[11px] uppercase tracking-wider text-ivory/40 font-body">
-            <div>Call: 080560 02400</div>
-            <div>Email: hello@yavi.studio</div>
+            <div>Call: {siteConfig.contact.phone}</div>
+            <div>Email: {siteConfig.contact.email}</div>
           </div>
         </div>
       </div>

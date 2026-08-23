@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     jwt_expire_minutes: int = 480
 
     # Admin bootstrap
-    admin_email: str = "admin@yavi.studio"
+    admin_email: str = "yaviinteriorwebsite01@gmail.com"
     admin_password: str = "change_me_now"
 
     # CORS

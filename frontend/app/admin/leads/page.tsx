@@ -40,15 +40,54 @@ export default function AdminLeadsPage() {
       .finally(() => setLoading(false));
   }, [token, status, search]);
 
+  const exportCSV = () => {
+    if (leads.length === 0) return;
+    const headers = ["Name", "Phone", "Email", "Location", "Project", "Style", "Budget", "Tier", "Status", "Date"];
+    const rows = leads.map(l => [
+      l.name || "",
+      l.phone || "",
+      (l as any).email || "",
+      (l as any).location || "",
+      l.project_type || "",
+      l.design_style || "",
+      l.budget || "",
+      l.lead_tier,
+      l.lead_status,
+      new Date(l.created_at).toLocaleDateString()
+    ].map(field => `"${field}"`).join(","));
+    
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `yavi_leads_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (!checked || !token) return null;
 
   return (
-    <div className="px-6 py-8 sm:px-10">
-      <h1 className="font-display text-2xl">Leads</h1>
+    <div className="px-6 py-8 sm:px-10 pb-20 sm:pb-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="font-display text-2xl">Leads Overview</h1>
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg bg-white border border-near-black/10 px-4 py-2 text-sm">
+            <span className="text-near-black/50">Total:</span> <span className="font-bold">{leads.length}</span>
+          </div>
+          <button 
+            onClick={exportCSV}
+            className="rounded-lg bg-charcoal text-ivory px-4 py-2 text-sm font-medium hover:bg-charcoal/90 transition-colors"
+          >
+            Export CSV
+          </button>
+        </div>
+      </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <input
-          placeholder="Search name, phone, email, location"
+          placeholder="Search name, phone, email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full max-w-xs rounded-lg border border-near-black/15 bg-white px-3 py-2 text-sm outline-none focus-visible:border-bronze"
@@ -73,8 +112,8 @@ export default function AdminLeadsPage() {
       </div>
 
       <div className="mt-6 overflow-x-auto rounded-xl border border-near-black/10 bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-near-black/10 text-xs uppercase text-near-black/50">
+        <table className="w-full text-left text-sm whitespace-nowrap min-w-[800px]">
+          <thead className="border-b border-near-black/10 text-xs uppercase text-near-black/50 bg-near-black/5">
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Contact</th>
@@ -97,7 +136,7 @@ export default function AdminLeadsPage() {
             {leads.map((lead) => (
               <tr key={lead.id} className="border-b border-near-black/5 last:border-0 hover:bg-near-black/[0.02]">
                 <td className="px-4 py-3">
-                  <Link href={`/admin/leads/${lead.id}`} className="font-medium text-near-black hover:text-bronze">
+                  <Link href={`/admin/leads/${lead.id}`} className="font-medium text-near-black hover:text-bronze underline underline-offset-2">
                     {lead.name || "—"}
                   </Link>
                 </td>
@@ -109,9 +148,9 @@ export default function AdminLeadsPage() {
                   <span
                     className={`rounded-full px-2 py-1 text-xs font-medium ${
                       lead.lead_tier === "HOT"
-                        ? "bg-red-100 text-red-700"
+                        ? "bg-red-100 text-red-700 border border-red-200"
                         : lead.lead_tier === "WARM"
-                        ? "bg-amber-100 text-amber-700"
+                        ? "bg-amber-100 text-amber-700 border border-amber-200"
                         : "bg-near-black/5 text-near-black/60"
                     }`}
                   >
@@ -173,9 +212,9 @@ export default function AdminLeadsPage() {
                       }
                     }}
                     title="Delete Lead"
-                    className="inline-flex items-center justify-center p-2 rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors"
+                    className="inline-flex items-center gap-1.5 justify-center px-2 py-1.5 rounded bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors border border-red-100 text-xs font-medium"
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={14} /> Delete
                   </button>
                 </td>
               </tr>

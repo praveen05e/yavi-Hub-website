@@ -52,7 +52,34 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           Log out
         </button>
       </aside>
-      <main className="flex-1 overflow-x-hidden">{children}</main>
+      <main className="flex-1 overflow-x-hidden pb-16 sm:pb-0">{children}</main>
+
+      {/* Mobile Bottom Nav */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-near-black/10 bg-white p-2 sm:hidden pb-safe">
+        {nav.map((item) => {
+          const Icon = item.icon;
+          const active = pathname.startsWith(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex flex-col items-center gap-1 rounded-lg p-2 text-xs transition-colors ${
+                active ? "text-charcoal font-medium" : "text-near-black/60"
+              }`}
+            >
+              <Icon size={20} />
+              {item.label}
+            </Link>
+          );
+        })}
+        <button
+          onClick={logout}
+          className="flex flex-col items-center gap-1 rounded-lg p-2 text-xs text-red-600/80 transition-colors"
+        >
+          <LogOut size={20} />
+          Log out
+        </button>
+      </nav>
     </div>
   );
 }

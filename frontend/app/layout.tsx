@@ -34,10 +34,14 @@ export const metadata: Metadata = {
 };
 
 import { Analytics } from "@vercel/analytics/react";
+import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable}`}>
+      <head>
+        <LocalBusinessSchema />
+      </head>
       <body className="font-body bg-ivory text-near-black">
         <SmoothScrollProvider>
           {children}

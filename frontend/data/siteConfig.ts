@@ -16,7 +16,7 @@ export const siteConfig = {
   // do not invent phone/email/address per project spec.
   contact: {
     phone: "080560 02400",
-    email: "hello@yavi.studio",
+    email: "yaviinteriorwebsite01@gmail.com",
     address: "Selaiyur, Chennai, Tiruvancheri, Tamil Nadu 600126",
     instagram: "https://www.instagram.com/yaviinteriorhub/",
     facebook: "https://www.facebook.com/yaviinteriorhub/",
