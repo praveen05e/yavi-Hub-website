@@ -12,7 +12,7 @@ export default function Footer() {
           {/* Left: Logo & Quote */}
           <div className="lg:col-span-4 flex flex-col items-start">
             <Link href="/" className="inline-block transition-transform hover:scale-105">
-              <Image src="/logo.png" alt="YAVI Logo" width={120} height={48} className="object-contain" />
+              <Image src="/logo.png" alt="YAVI Logo" width={80} height={80} className="object-contain" />
             </Link>
             <p className="mt-6 text-lg font-display italic text-near-black/80">
               "{siteConfig.tagline}"

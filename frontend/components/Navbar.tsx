@@ -41,7 +41,7 @@ export default function Navbar() {
           <Link href="/" className={`transition-all duration-300 ${
             lightMode ? "brightness-0 invert" : ""
           }`}>
-            <Image src="/logo.png" alt="YAVI Logo" width={100} height={40} className="object-contain" priority />
+            <Image src="/logo.png" alt="YAVI Logo" width={56} height={56} className="object-contain" priority />
           </Link>
 
           <nav className="hidden items-center gap-10 md:flex">
@@ -94,7 +94,7 @@ export default function Navbar() {
         {...(!open ? { inert: true } : {})}
       >
         <div className="flex items-center justify-between px-6 py-6">
-          <Image src="/logo.png" alt="YAVI Logo" width={90} height={36} className="object-contain brightness-0 invert" priority />
+          <Image src="/logo.png" alt="YAVI Logo" width={48} height={48} className="object-contain brightness-0 invert" priority />
           <button aria-label="Close menu" onClick={() => setOpen(false)} className="p-2">
             <X size={26} />
           </button>
