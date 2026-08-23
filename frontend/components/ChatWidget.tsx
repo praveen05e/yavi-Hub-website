@@ -183,7 +183,7 @@ export default function ChatWidget() {
         aria-modal="true"
         aria-label="YAVI Design Concierge"
       >
-        <div className="flex items-center justify-between border-b border-near-black/10 px-5 py-4">
+        <div className="flex items-center justify-between border-b border-near-black/10 px-5 py-4 bg-ivory relative z-10">
           <div>
             <div className="font-display text-lg text-near-black">Design Concierge</div>
             <div className="text-xs text-near-black/50">YAVI</div>
@@ -193,7 +193,12 @@ export default function ChatWidget() {
           </button>
         </div>
 
-        <div ref={scrollRef} data-lenis-prevent className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
+        {/* Watermark Background */}
+        <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.03]">
+          <img src="/logo.png" alt="" className="w-64 h-64 object-contain" />
+        </div>
+
+        <div ref={scrollRef} data-lenis-prevent className="relative z-10 flex-1 space-y-4 overflow-y-auto px-5 py-5">
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
               <div
@@ -212,7 +217,7 @@ export default function ChatWidget() {
           )}
         </div>
 
-        <div className="border-t border-near-black/10 p-4 pb-6 sm:pb-4">
+        <div className="border-t border-near-black/10 p-4 pb-6 sm:pb-4 bg-ivory relative z-10">
           {errorFallback ? (
             <a
               href="/contact"
