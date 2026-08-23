@@ -48,10 +48,16 @@ export default function AdminLeadDetailPage() {
 
   const updateStatus = async (status: string) => {
     if (!token || !lead) return;
+    const oldLead = { ...lead };
+    setLead({ ...lead, lead_status: status }); // Optimistic update
+    
     setUpdating(true);
     try {
       const updated = await api.updateLeadStatus(token, leadId, status);
       setLead(updated as Lead);
+    } catch (err) {
+      setLead(oldLead); // Revert on failure
+      alert("Failed to update status");
     } finally {
       setUpdating(false);
     }

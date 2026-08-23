@@ -162,12 +162,20 @@ export default function AdminLeadsPage() {
                     value={lead.lead_status}
                     onChange={async (e) => {
                       const newStatus = e.target.value;
+                      const oldStatus = lead.lead_status;
+                      
+                      // Optimistic UI update
+                      setLeads((prev) =>
+                        prev.map((l) => (l.id === lead.id ? { ...l, lead_status: newStatus } : l))
+                      );
+                      
                       try {
                         await api.updateLeadStatus(token, lead.id, newStatus);
-                        setLeads((prev) =>
-                          prev.map((l) => (l.id === lead.id ? { ...l, lead_status: newStatus } : l))
-                        );
                       } catch (err) {
+                        // Revert on failure
+                        setLeads((prev) =>
+                          prev.map((l) => (l.id === lead.id ? { ...l, lead_status: oldStatus } : l))
+                        );
                         alert("Failed to update status");
                       }
                     }}
