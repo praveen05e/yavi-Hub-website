@@ -29,6 +29,14 @@ def _known_fields_from_lead(lead: models.Lead | None) -> dict:
     }
 
 
+def _has_contact_info(fields: dict) -> bool:
+    phone = fields.get("phone")
+    email = fields.get("email")
+    has_phone = phone and phone.strip() and phone.strip() != "0000000000"
+    has_email = email and email.strip() and email.strip() != "notshared@yavi.studio"
+    return bool(has_phone or has_email)
+
+
 @router.post("/message", response_model=schemas.ChatMessageOut)
 @limiter.limit("20/minute")
 def send_message(request: Request, payload: schemas.ChatMessageIn, db: Session = Depends(get_db)):
@@ -55,11 +63,12 @@ def send_message(request: Request, payload: schemas.ChatMessageIn, db: Session =
         score, tier = score_lead(result["fields"])
 
         if not lead:
-            lead = models.Lead(**{k: v for k, v in result["fields"].items() if k in chatbot_service.REQUIRED_FIELDS},
-                                lead_score=score, lead_tier=tier)
-            db.add(lead)
-            db.flush()
-            convo.lead_id = lead.id
+            if _has_contact_info(result["fields"]):
+                lead = models.Lead(**{k: v for k, v in result["fields"].items() if k in chatbot_service.REQUIRED_FIELDS},
+                                    lead_score=score, lead_tier=tier)
+                db.add(lead)
+                db.flush()
+                convo.lead_id = lead.id
         else:
             for k, v in result["fields"].items():
                 if v and k in chatbot_service.REQUIRED_FIELDS:
