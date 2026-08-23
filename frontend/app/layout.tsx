@@ -26,6 +26,13 @@ export const metadata: Metadata = {
     template: "%s — Yavi Interior Hub",
   },
   description: siteConfig.heroSupportingText,
+  icons: {
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [{ url: "/icon.png" }],
+  },
   openGraph: {
     title: "Yavi Interior Hub",
     description: siteConfig.heroSupportingText,

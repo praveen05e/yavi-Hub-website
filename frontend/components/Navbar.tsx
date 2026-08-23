@@ -38,10 +38,15 @@ export default function Navbar() {
             scrolled ? "h-16" : "h-24"
           }`}
         >
-          <Link href="/" className={`transition-all duration-300 ${
-            lightMode ? "brightness-0 invert" : ""
-          }`}>
-            <Image src="/logo.png" alt="YAVI Logo" width={56} height={56} className="object-contain" priority />
+          <Link href="/" className="transition-transform duration-300 hover:scale-105">
+            <Image
+              src={lightMode ? "/logo-light.png" : "/logo.png"}
+              alt="YAVI Logo"
+              width={52}
+              height={52}
+              className="object-contain"
+              priority
+            />
           </Link>
 
           <nav className="hidden items-center gap-10 md:flex">
@@ -94,7 +99,7 @@ export default function Navbar() {
         {...(!open ? { inert: true } : {})}
       >
         <div className="flex items-center justify-between px-6 py-6">
-          <Image src="/logo.png" alt="YAVI Logo" width={48} height={48} className="object-contain brightness-0 invert" priority />
+          <Image src="/logo-light.png" alt="YAVI Logo" width={48} height={48} className="object-contain" priority />
           <button aria-label="Close menu" onClick={() => setOpen(false)} className="p-2">
             <X size={26} />
           </button>
