@@ -194,7 +194,7 @@ export default function ChatWidget() {
         </div>
 
         {/* Watermark Background */}
-        <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.03]">
+        <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center opacity-[0.08]">
           <img src="/logo.png" alt="" className="w-64 h-64 object-contain" />
         </div>
 
