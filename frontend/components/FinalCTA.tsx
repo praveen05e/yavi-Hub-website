@@ -16,7 +16,7 @@ export default function FinalCTA() {
       <div className="relative mx-auto max-w-3xl px-6 text-center">
         <TextReveal>
           <h2 className="font-display text-4xl text-ivory sm:text-5xl">Let&rsquo;s design your next space.</h2>
-          <p className="mx-auto mt-5 max-w-lg text-ivory/75">
+          <p className="mx-auto mt-5 max-w-lg text-ivory opacity-80">
             Tell us about your space, your ideas, and the way you want it to feel.
           </p>
         </TextReveal>

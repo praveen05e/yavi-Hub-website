@@ -95,8 +95,7 @@ class MockOpenAIProvider(AIProvider):
             query_response = (
                 "For villas, we specialize in premium **Full Home Turnkey Interiors**, from modular layouts to custom stone paneling.\n"
                 "Here is one of our premium villa living rooms:\n"
-                "![YAVI Villa Project](/images/services/villa.jpg)\n"
-                "👉 [View our Villa Portfolio](/projects/modern-villa-chennai)\n\n"
+                "![YAVI Villa Project](/images/services/villa.jpg)\n\n"
             )
         elif ("apartment" in last_msg_lower or "flat" in last_msg_lower) and not ("type of property" in last_assistant_msg):
             is_query = True
@@ -104,8 +103,7 @@ class MockOpenAIProvider(AIProvider):
             query_response = (
                 "For apartments, we design **space-maximizing modular furniture** and custom wall treatments to make the space feel large and open.\n"
                 "Here is a living room we designed:\n"
-                "![YAVI Apartment Project](/images/services/apartment.jpg)\n"
-                "👉 [View our Apartment Portfolio](/projects/contemporary-apartment-3bhk)\n\n"
+                "![YAVI Apartment Project](/images/services/apartment.jpg)\n\n"
             )
         elif "kitchen" in last_msg_lower and not ("type of property" in last_assistant_msg):
             is_query = True
@@ -121,8 +119,7 @@ class MockOpenAIProvider(AIProvider):
             query_response = (
                 "For corporate spaces, we provide end-to-end **Office Fitouts** designed for productivity and brand identity.\n"
                 "Here is one of our executive reception designs:\n"
-                "![YAVI Office Project](/images/services/office.jpg)\n"
-                "👉 [View our Office Fitout Projects](/projects/boutique-office-fitout)\n\n"
+                "![YAVI Office Project](/images/services/office.jpg)\n\n"
             )
 
         # 2. If it's a real response, extract and validate fields
@@ -210,16 +207,14 @@ class MockOpenAIProvider(AIProvider):
             service_prefix = (
                 "For villas, we specialize in premium **Full Home Turnkey Interiors**, handling everything from layout changes to custom paneling.\n\n"
                 "Here is one of our premium villa living rooms:\n"
-                "![YAVI Villa Project](/images/services/villa.jpg)\n"
-                "👉 [View our Villa Portfolio](/projects/modern-villa-chennai)\n\n"
+                "![YAVI Villa Project](/images/services/villa.jpg)\n\n"
             )
         elif "apartment" in last_msg_lower or "flat" in last_msg_lower:
             fields["property_type"] = "Apartment"
             service_prefix = (
                 "For apartments, we design **space-maximizing modular furniture** and custom wall treatments to make the space feel large and open.\n\n"
                 "Here is a living room we designed:\n"
-                "![YAVI Apartment Project](/images/services/apartment.jpg)\n"
-                "👉 [View our Apartment Portfolio](/projects/contemporary-apartment-3bhk)\n\n"
+                "![YAVI Apartment Project](/images/services/apartment.jpg)\n\n"
             )
         elif "kitchen" in last_msg_lower:
             fields["property_type"] = "Kitchen"
@@ -233,8 +228,7 @@ class MockOpenAIProvider(AIProvider):
             service_prefix = (
                 "For corporate spaces, we provide end-to-end **Office Fitouts** designed for productivity and brand identity.\n\n"
                 "Here is one of our executive reception designs:\n"
-                "![YAVI Office Project](/images/services/office.jpg)\n"
-                "👉 [View our Office Fitout Projects](/projects/boutique-office-fitout)\n\n"
+                "![YAVI Office Project](/images/services/office.jpg)\n\n"
             )
 
         # Check if asking about pricing/cost/packages
